@@ -2,26 +2,31 @@
 emulator.cpp - emulator window implementation
 
 Copyright (C) 2015  Balázs Kóti (ktibalazs@gmail.com)
+Copyright (C) 2018  DK6YF (picohari@gmail.com)
 
 This file is part of Adafruit SSD1306 OLED screen emulator for development.
 
-Foobar is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
+associated documentation files (the "Software"), to deal in the Software without restriction, 
+including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do 
+so, subject to the following conditions:
 
-Foobar is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-You should have received a copy of the GNU General Public License
-along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
 #include "emulator.h"
 #include "ui_emulator.h"
+#include "aboutdialog.h"
+#include "ui_aboutdialog.h"
 
 #include <QLayout>
 #include <QThread>
@@ -56,6 +61,8 @@ along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 #define sleep(s) QApplication::processEvents(QEventLoop::AllEvents);\
                     Sleeper::sleep(s);
 
+
+/* Include font files here */
 #include "font/FreeSans12pt7b.h"
 
 
@@ -75,9 +82,8 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Create Emulator Widget */
     Adafruit_SSD1306* emulator = new Adafruit_SSD1306;
 
-    //emulator->show();
-    emulator->setEmulatorZoom(2);
-    emulator->setSpeedEmulation(false);
+    emulator->setEmulatorZoom(3);           /* Set zooming level */
+    emulator->setSpeedEmulation(false);     /* Set simulation speed */
 
     /* Connect Emulator to centralWidget */
     ui->centralWidget->layout()->addWidget(emulator);
@@ -112,31 +118,35 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     emulator->begin();
 
+    this->statusBar()->showMessage("Loaded SSD1603");
+
 
     /* Initialize Screen */
     emulator->clearDisplay();   // clears the screen and buffer
 
-    emulator->setTextSize(1);
-    emulator->setTextColor(WHITE);
     
 
-    /* INSERT CODE HERE */
+    /* ==> INSERT CODE HERE - BEGIN <== */
+
+    emulator->setTextSize(1);
+    emulator->setTextColor(WHITE);
 
     emulator->setFont(&FreeSans12pt7b);
-    emulator->setCursor(0,61);
+    emulator->setCursor(7,31);
 
     static char tmp[36] = {0};
     sprintf(tmp, "%s", "Hallo Welt!");
     emulator->print(tmp);
+    
     //emulator->print("Hallo Welt!");
 
+    /* ==> INSERT CODE HERE - END <== */
 
 
-    /* END CODE */
 
+    /* Must be called at the end to refresh the display */
     emulator->display();
 
-    this->statusBar()->showMessage("Loaded SSD1603");
 }
 
 
@@ -151,10 +161,11 @@ void MainWindow::on_actionQuit_triggered()
     QApplication::quit();
 }
 
-
-
-
-
+void MainWindow::on_actionAbout_triggered()
+{
+    AboutDialog dlg(this);
+    dlg.exec();
+}
 
 Adafruit_SSD1306::Adafruit_SSD1306(QWidget *parent) : 
 
@@ -709,4 +720,6 @@ void Adafruit_SSD1306::setEmulatorZoom(int z){
                        screenHeight * emulatorZoom);
 */
 }
+
+
 

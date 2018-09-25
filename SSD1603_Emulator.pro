@@ -24,17 +24,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        emulator.cpp \
-        glcdfont.c
+    main.cpp \
+    emulator.cpp \
+    glcdfont.c \
+    aboutdialog.cpp
 
 HEADERS += \
-        emulator.h \
-        gfxfont.h \
+    emulator.h \
+    gfxfont.h \
+    aboutdialog.h \
+    app_types.h
 
 FORMS += \
-    emulator.ui
+    emulator.ui \
+    aboutdialog.ui
 
 RESOURCES += \
-    emulator.qrc
+    emulator.qrc \
+    about.qrc
 
+
+
+DEFINES += BUILDTIME=\\\"$$system(date '+%H:%M:%S')\\\"
+DEFINES += BUILDDATE=\\\"$$system(date '+%d.%m.%y')\\\"
