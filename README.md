@@ -1,9 +1,8 @@
+![QEmulator](https://github.com/picohari/ssd1306_QEmulator/images/emulator.png)
+
 # SSD1306 OLED Emulator for ADAFRUIT GFX Library
 
 A simple QT Application emulating a SSD1306 OLED based display module with the ADAFRUIT GFX Library for Arduino.
-
-![QEmulator](https://github.com/picohari/ssd1306_QEmulator/images/emulator.png)
-
 
 ## Getting Started
 

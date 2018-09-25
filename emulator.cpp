@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Create Emulator Widget */
     Adafruit_SSD1306* emulator = new Adafruit_SSD1306;
 
-    emulator->setEmulatorZoom(3);           /* Set zooming level */
+    emulator->setEmulatorZoom(2);           /* Set zooming level */
     emulator->setSpeedEmulation(false);     /* Set simulation speed */
 
     /* Connect Emulator to centralWidget */
@@ -251,14 +251,23 @@ void Adafruit_SSD1306::checkState(){
 
 bool Adafruit_SSD1306::oled_is_spi_proto(int device){
     //NOT SPI
+    (void) device;
+
     return false;
 }
 
 bool Adafruit_SSD1306::init(int a, int b, int c, int oled_type){
+
+    (void) a;
+    (void) b;
+    (void) c;
+    
     return init(b,oled_type);
 }
 
 bool Adafruit_SSD1306::init(int a, int oled_type){
+
+    (void) a;
 
     switch(oled_type){
         case OLED_ADAFRUIT_SPI_128x32:
@@ -394,7 +403,7 @@ void Adafruit_SSD1306::drawBitmap(int x, int y, const unsigned char *bitmap, int
     tempPaint.setPen(color);
 
     for(int i = 0; i < w*h; i++){
-        bool value = (bitmap[i/8] >> (7-(i%8))) & 0x01 == 0x01 ? true : false;
+        bool value = ((bitmap[i/8] >> (7-(i%8))) & 0x01) == 0x01 ? true : false;
         if(value){
             tempPaint.drawPoint(i%w,i/w);
         }
@@ -454,7 +463,7 @@ void Adafruit_SSD1306::print(const char *string){
 */
 
     // Use Adafruit variable font
-    uint8_t i;
+    uint8_t i = 0;
 
     while (string[i] != '\0')
         write(string[i++]);
@@ -689,6 +698,7 @@ void Adafruit_SSD1306::drawBitmap(int x, int y, const unsigned char *bitmap, int
 
 void Adafruit_SSD1306::setRotation(int r){
     //no rotation in development
+    (void) r;
     return;
 }
 
