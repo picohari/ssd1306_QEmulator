@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/res">
-        <file alias="icon">emulator.ico</file>
+        <file alias="icon">images/emulator.ico</file>
+        <file alias="snoopy">images/snoopy.png</file>
     </qresource>
     <qresource prefix="/font">
         <file alias="pixelmix">font/pixelmix.ttf</file>

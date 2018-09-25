@@ -53,6 +53,14 @@ Insert your code to test between these markers, for example:
 
 Finaly build and run your project by hitting `CTRL + R`.
 
+### Build from console:
+
+Generate Makefile with `qmake` and build executable:
+
+```
+qmake SSD1603_Emulator.pro && make
+```
+
 ## Built With
 
 * [Qt Creator](http://www.qt.io/) - The Qt framework used

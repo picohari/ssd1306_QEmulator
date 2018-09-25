@@ -476,9 +476,7 @@ void Adafruit_SSD1306::drawChar(int16_t x, int16_t y, unsigned char c, QColor co
 
         //startWrite();
         for(uint8_t i=0; i<5; i++ ) { // Char bitmap = 5 columns
-            
             uint8_t line = pgm_read_byte(&font[c * 5 + i]);
-            
             for(int8_t j=0; j<8; j++, line >>= 1) {
                 if(line & 1) {
                     if(size == 1)
