@@ -1,4 +1,4 @@
-![QEmulator](https://github.com/picohari/ssd1306_QEmulator/images/emulator.png)
+![QEmulator](https://github.com/picohari/ssd1306_QEmulator/raw/master/images/emulator.png)
 
 # SSD1306 OLED Emulator for ADAFRUIT GFX Library
 
