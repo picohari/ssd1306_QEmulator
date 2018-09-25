@@ -128,17 +128,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /* ==> INSERT CODE HERE - BEGIN <== */
 
+    // Set default color and size
     emulator->setTextSize(1);
     emulator->setTextColor(WHITE);
 
+    // Using Adafruit fonts
     emulator->setFont(&FreeSans12pt7b);
     emulator->setCursor(7,31);
-
     static char tmp[36] = {0};
     sprintf(tmp, "%s", "Hallo Welt!");
     emulator->print(tmp);
     
-    //emulator->print("Hallo Welt!");
+    // Using glcdfont
+    emulator->setFont(NULL);
+    emulator->setCursor(4,45);
+    emulator->print("All your base are us");
 
     /* ==> INSERT CODE HERE - END <== */
 

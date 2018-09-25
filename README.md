@@ -23,10 +23,10 @@ sudo apt-get install qtcreator
 Clone this git repository to your harddisk:
 
 ```
-git clone https://github.com/picohari/ssd1306_oled_emulator.git
+git clone https://github.com/picohari/ssd1306_QEmulator.git
 ```
 
-Open `SSD1603_Emulator.pro` in QT Creator:
+Open `SSD1603_Emulator.pro` in Qt Creator:
 
 ```
 qtcreator SSD1603_Emulator.pro
@@ -50,14 +50,20 @@ Insert your code to test between these markers, for example:
     /* ==> INSERT CODE HERE - END <== */
 ```
 
-Finaly build and run your project by hitting `CTRL + R`.
+Finaly build and run your project by hitting `CTRL + R`. This will create some basic files needed for Qt lib to work and the Makefile.
 
-### Build from console:
+### Build from Console:
 
-Generate Makefile with `qmake` and build executable:
+Once you have everything running, use the console to re-build a new version with `make` and debug:
 
 ```
 qmake SSD1603_Emulator.pro && make
+```
+
+Then run the emulator:
+
+```
+./SSD1306_Emulator
 ```
 
 ## Built With

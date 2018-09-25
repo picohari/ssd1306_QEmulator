@@ -42,7 +42,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 //colors
 #define BLACK QColor(0,0,0)
-#define WHITE QColor(255,255,255)
+#define WHITE QColor(222,239,232)
 
 //fake constants
 #define OLED_SPI_RESET              0
