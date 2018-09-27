@@ -27,17 +27,20 @@ SOURCES += \
     main.cpp \
     emulator.cpp \
     glcdfont.c \
-    aboutdialog.cpp
+    aboutdialog.cpp \
+    mainwindow.cpp \
 
 HEADERS += \
     emulator.h \
     gfxfont.h \
     aboutdialog.h \
-    app_types.h
+    app_types.h \
+    mainwindow.h \
 
 FORMS += \
     emulator.ui \
-    aboutdialog.ui
+    aboutdialog.ui \
+    mainwindow.ui \
 
 RESOURCES += \
     emulator.qrc \

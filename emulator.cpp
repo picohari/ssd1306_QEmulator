@@ -6,25 +6,29 @@ Copyright (C) 2018  DK6YF (picohari@gmail.com)
 
 This file is part of Adafruit SSD1306 OLED screen emulator for development.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
-associated documentation files (the "Software"), to deal in the Software without restriction, 
-including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do 
-so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
-OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 */
 
 
 #include "emulator.h"
 #include "ui_emulator.h"
+
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
@@ -66,24 +70,34 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "font/FreeSans12pt7b.h"
 
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+
+EmulatorWidget::EmulatorWidget(QWidget *parent) :
+    QWidget(parent)
+    //container(new EmulatorContainer::Emulator)
 {
+    
 
+}
+
+#if 0
     /* Setup MainWindow */
-    ui->setupUi(this);
+    //ui->setupUi(this);
 
-    QLayout* centralLayout = new QVBoxLayout;
-    centralLayout->setSpacing(0);
-    centralLayout->setMargin(0);
-    ui->centralWidget->setLayout(centralLayout);
+    QVBoxLayout* verticalLayout = new QVBoxLayout;
+    verticalLayout->setSpacing(0);
+    verticalLayout->setMargin(0);
+    ui->centralWidget->setLayout(verticalLayout);
+
+    //QGridLayout* gridLayout = new QGridLayout;
+    //verticalLayout->addLayout(gridLayout);
+
 
     /* Create Emulator Widget */
     Adafruit_SSD1306* emulator = new Adafruit_SSD1306;
 
     emulator->setEmulatorZoom(2);           /* Set zooming level */
     emulator->setSpeedEmulation(false);     /* Set simulation speed */
+
 
     /* Connect Emulator to centralWidget */
     ui->centralWidget->layout()->addWidget(emulator);
@@ -116,6 +130,7 @@ MainWindow::MainWindow(QWidget *parent) :
         if ( !emulator->init(OLED_I2C_RESET, oled_type) )
             exit(EXIT_FAILURE);
     }
+    
     emulator->begin();
 
     this->statusBar()->showMessage("Loaded SSD1603");
@@ -154,12 +169,14 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 
-MainWindow::~MainWindow()
+EmulatorWidget::~Emulator()
 {
-    delete ui;
+    delete container;
 }
+#endif
 
 
+#if 0
 void MainWindow::on_actionQuit_triggered()
 {
     QApplication::quit();
@@ -170,6 +187,8 @@ void MainWindow::on_actionAbout_triggered()
     AboutDialog dlg(this);
     dlg.exec();
 }
+#endif
+
 
 Adafruit_SSD1306::Adafruit_SSD1306(QWidget *parent) : 
 
