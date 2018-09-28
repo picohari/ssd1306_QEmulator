@@ -82,7 +82,7 @@ private:
     int somevalue;
 };
 
-
+//extern EmulatorWidget *emulator;
 
 
 
@@ -190,5 +190,7 @@ private:
     bool speedEmultaion;
 
 };
+
+//extern Adafruit_SSD1306 *emulator;
 
 #endif // EMULATOR_H

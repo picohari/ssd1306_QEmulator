@@ -27,7 +27,6 @@ THE SOFTWARE.
 
 
 #include "emulator.h"
-#include "ui_emulator.h"
 
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
@@ -70,6 +69,7 @@ THE SOFTWARE.
 #include "font/FreeSans12pt7b.h"
 
 
+//EmulatorWidget *emulator;
 
 EmulatorWidget::EmulatorWidget(QWidget *parent) :
     QWidget(parent)
@@ -189,6 +189,7 @@ void MainWindow::on_actionAbout_triggered()
 }
 #endif
 
+//Adafruit_SSD1306 *emulator = new Adafruit_SSD1306;
 
 Adafruit_SSD1306::Adafruit_SSD1306(QWidget *parent) : 
 

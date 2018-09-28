@@ -27,7 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->emulatorContainer->setLayout(verticalLayout);
 
     /* Create Emulator Widget */
-    Adafruit_SSD1306* emulator = new Adafruit_SSD1306;
+    Adafruit_SSD1306 *emulator = new Adafruit_SSD1306;
+    //emulator = new Adafruit_SSD1306;
 
     /* Set some default parameter */
     emulator->setEmulatorZoom(2);           /* Set zooming level */
@@ -77,9 +78,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->statusBar()->showMessage("Loaded SSD1603");
 
 
-
     /* Initialize Screen */
-    emulator->clearDisplay();   // clears the screen and buffer
+    //emulator->clearDisplay();   // clears the screen and buffer
 
     
 
@@ -89,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :
     emulator->setTextSize(1);
     emulator->setTextColor(WHITE);
 
+#if 0
     // Using Adafruit fonts
     emulator->setFont(&FreeSans12pt7b);
     emulator->setCursor(7,31);
@@ -100,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     emulator->setFont(NULL);
     emulator->setCursor(4,45);
     emulator->print("All your base are us");
+#endif
 
     /* ==> INSERT CODE HERE - END <== */
 

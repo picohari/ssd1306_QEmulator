@@ -38,7 +38,6 @@ HEADERS += \
     mainwindow.h \
 
 FORMS += \
-    emulator.ui \
     aboutdialog.ui \
     mainwindow.ui \
 
