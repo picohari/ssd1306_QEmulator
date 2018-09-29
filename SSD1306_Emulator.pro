@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SSD1603_Emulator
+TARGET = SSD1306_Emulator
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -36,6 +36,11 @@ HEADERS += \
     aboutdialog.h \
     app_types.h \
     mainwindow.h \
+
+INCLUDEPATH += \
+    ../../libraries/Adafruit_GFX_Menu/ \
+    ../../libraries/Adafruit_GFX_Library/ \
+    ../../libraries/Adafruit_SSD1306/ \
 
 FORMS += \
     aboutdialog.ui \
