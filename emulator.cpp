@@ -238,6 +238,7 @@ Adafruit_SSD1306::Adafruit_SSD1306(QWidget *parent) :
     // Adafruit fonts (via drawPixel)
     wrap      = true;
     gfxFont   = NULL;
+
 }
 
 Adafruit_SSD1306::~Adafruit_SSD1306()

@@ -12,6 +12,8 @@
 
 /* Include font files here */
 #include "font/FreeSans12pt7b.h"
+#include "font/FreeSans9pt7b.h"
+#include "font/mina.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -77,19 +79,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->statusBar()->showMessage("Loaded SSD1603");
 
+#if 1
+    /* ==> INSERT CODE HERE - BEGIN <== */
 
     /* Initialize Screen */
-    //emulator->clearDisplay();   // clears the screen and buffer
-
-    
-
-    /* ==> INSERT CODE HERE - BEGIN <== */
+    emulator->clearDisplay();   // clears the screen and buffer
 
     // Set default color and size
     emulator->setTextSize(1);
     emulator->setTextColor(WHITE);
 
-#if 0
     // Using Adafruit fonts
     emulator->setFont(&FreeSans12pt7b);
     emulator->setCursor(7,31);
@@ -98,17 +97,24 @@ MainWindow::MainWindow(QWidget *parent) :
     emulator->print(tmp);
     
     // Using glcdfont
-    emulator->setFont(NULL);
-    emulator->setCursor(4,45);
-    emulator->print("All your base are us");
-#endif
+    emulator->setFont(&mina10pt8b);
+    emulator->setCursor(0, 10);
+    sprintf(tmp, "%s", "All your base are us!");
+    emulator->print(tmp);
+    
+    // Use of standard text
+    //emulator->setFont(NULL);
+    //emulator->print("All your base are us");
 
-    /* ==> INSERT CODE HERE - END <== */
-
-
+    emulator->drawPixel(0, 0, WHITE);
+    emulator->drawPixel(127, 0, WHITE);
+    emulator->drawPixel(0, 63, WHITE);
+    emulator->drawPixel(127, 63, WHITE);
 
     /* Must be called at the end to refresh the display */
     emulator->display();
+    /* ==> INSERT CODE HERE - END <== */
+#endif
 
 
 }
@@ -128,4 +134,30 @@ void MainWindow::on_actionAbout_triggered()
 {
     AboutDialog dlg(this);
     dlg.exec();
+}
+
+
+void MainWindow::on_pushButton_LEFT_clicked()
+{
+    qDebug("LEFT");
+}
+
+void MainWindow::on_pushButton_RIGHT_clicked()
+{
+    qDebug("RIGHT");
+}
+
+void MainWindow::on_pushButton_UP_clicked()
+{
+    qDebug("UP");
+}
+
+void MainWindow::on_pushButton_DOWN_clicked()
+{
+    qDebug("DOWN");
+}
+
+void MainWindow::on_pushButton_OK_clicked()
+{
+    qDebug("OK");
 }

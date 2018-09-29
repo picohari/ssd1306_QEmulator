@@ -19,6 +19,11 @@ private slots:
     void on_actionQuit_triggered();
     void on_actionAbout_triggered();
 
+    void on_pushButton_LEFT_clicked();
+    void on_pushButton_RIGHT_clicked();
+    void on_pushButton_UP_clicked();
+    void on_pushButton_DOWN_clicked();
+    void on_pushButton_OK_clicked();
 private:
     Ui::MainWindow *ui;
 };
