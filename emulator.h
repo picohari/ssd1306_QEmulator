@@ -64,34 +64,8 @@ THE SOFTWARE.
 #define	OLED_SEEED_I2C_96x96        5
 #define OLED_LAST_OLED				6 /* always last type, used in code to end array */
 
-
-
-
-
-class EmulatorWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit EmulatorWidget(QWidget *parent = 0);
-    //~Emulator();
-    void initUI(void);
-
-
-private:
-    int somevalue;
-};
-
-//extern EmulatorWidget *emulator;
-
-
-
-
-
-
-
-
-
+#define SSD1306_LCDWIDTH            128
+#define SSD1306_LCDHEIGHT           64
 
 class Sleeper : public QThread
 {
@@ -191,6 +165,8 @@ private:
 
 };
 
-//extern Adafruit_SSD1306 *emulator;
+
+/* Pointer to current display driver instance */
+extern Adafruit_SSD1306 *display;
 
 #endif // EMULATOR_H

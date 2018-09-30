@@ -29,6 +29,7 @@ SOURCES += \
     glcdfont.c \
     aboutdialog.cpp \
     mainwindow.cpp \
+    ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.cpp \
 
 HEADERS += \
     emulator.h \
@@ -36,6 +37,7 @@ HEADERS += \
     aboutdialog.h \
     app_types.h \
     mainwindow.h \
+    ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.h \
 
 INCLUDEPATH += \
     ../../libraries/Adafruit_GFX_Menu/ \

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>274</width>
-    <height>248</height>
+    <height>273</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,15 +59,35 @@
       </property>
       <item row="1" column="0">
        <widget class="QPushButton" name="pushButton_LEFT">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
-         <string>LEFT</string>
+         <string>←</string>
+        </property>
+        <property name="shortcut">
+         <string>Left</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="pushButton_UP">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
-         <string>UP</string>
+         <string>↑</string>
+        </property>
+        <property name="shortcut">
+         <string>Up</string>
         </property>
        </widget>
       </item>
@@ -76,19 +96,42 @@
         <property name="text">
          <string>OK</string>
         </property>
+        <property name="shortcut">
+         <string>Space</string>
+        </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QPushButton" name="pushButton_DOWN">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
-         <string>DOWN</string>
+         <string>↓	</string>
+        </property>
+        <property name="shortcut">
+         <string>Down</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
        <widget class="QPushButton" name="pushButton_RIGHT">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
-         <string>RIGHT</string>
+         <string>→</string>
+        </property>
+        <property name="shortcut">
+         <string>Right</string>
         </property>
        </widget>
       </item>

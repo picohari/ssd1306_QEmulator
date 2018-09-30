@@ -66,134 +66,9 @@ THE SOFTWARE.
                     Sleeper::sleep(s);
 
 
-/* Include font files here */
-#include "font/FreeSans12pt7b.h"
 
-
-//EmulatorWidget *emulator;
-
-EmulatorWidget::EmulatorWidget(QWidget *parent) :
-    QWidget(parent)
-    //container(new EmulatorContainer::Emulator)
-{
-    
-
-}
-
-#if 0
-    /* Setup MainWindow */
-    //ui->setupUi(this);
-
-    QVBoxLayout* verticalLayout = new QVBoxLayout;
-    verticalLayout->setSpacing(0);
-    verticalLayout->setMargin(0);
-    ui->centralWidget->setLayout(verticalLayout);
-
-    //QGridLayout* gridLayout = new QGridLayout;
-    //verticalLayout->addLayout(gridLayout);
-
-
-    /* Create Emulator Widget */
-    Adafruit_SSD1306* emulator = new Adafruit_SSD1306;
-
-    emulator->setEmulatorZoom(2);           /* Set zooming level */
-    emulator->setSpeedEmulation(false);     /* Set simulation speed */
-
-
-    /* Connect Emulator to centralWidget */
-    ui->centralWidget->layout()->addWidget(emulator);
-
-    /* Create Window Title and Icon */
-    this->setWindowTitle("Adafruit OLED emulator ("
-            +QString::number(emulator->device_width()  * emulator->getEmulatorZoom()) + "x"
-            +QString::number(emulator->device_height() * emulator->getEmulatorZoom()) + ")");
-
-    this->setWindowIcon(QIcon(":/res/icon"));
-    
-    /* Resize Window */
-    this->setFixedSize(emulator->device_width()  * emulator->getEmulatorZoom(), 
-                       emulator->device_height() * emulator->getEmulatorZoom() + 
-                       this->menuBar()->size().height() +
-                       this->menuBar()->size().height());
-
-    this->statusBar()->setSizeGripEnabled(false);
-
-
-    /* Initialize Emulator */
-    int oled_type = OLED_ADAFRUIT_I2C_128x64;
-    if (emulator->oled_is_spi_proto(oled_type)){
-        //SPI change parameters to fit to your LCD
-        if ( !emulator->init(OLED_SPI_DC,OLED_SPI_RESET,OLED_SPI_CS, oled_type) )
-            exit(EXIT_FAILURE);
-    }
-    else{
-        //I2C change parameters to fit to your LCD
-        if ( !emulator->init(OLED_I2C_RESET, oled_type) )
-            exit(EXIT_FAILURE);
-    }
-    
-    emulator->begin();
-
-    this->statusBar()->showMessage("Loaded SSD1603");
-
-
-    /* Initialize Screen */
-    emulator->clearDisplay();   // clears the screen and buffer
-
-    
-
-    /* ==> INSERT CODE HERE - BEGIN <== */
-
-    // Set default color and size
-    emulator->setTextSize(1);
-    emulator->setTextColor(WHITE);
-
-    // Using Adafruit fonts
-    emulator->setFont(&FreeSans12pt7b);
-    emulator->setCursor(7,31);
-    static char tmp[36] = {0};
-    sprintf(tmp, "%s", "Hallo Welt!");
-    emulator->print(tmp);
-    
-    // Using glcdfont
-    emulator->setFont(NULL);
-    emulator->setCursor(4,45);
-    emulator->print("All your base are us");
-
-    /* ==> INSERT CODE HERE - END <== */
-
-
-
-    /* Must be called at the end to refresh the display */
-    emulator->display();
-
-}
-
-
-EmulatorWidget::~Emulator()
-{
-    delete container;
-}
-#endif
-
-
-#if 0
-void MainWindow::on_actionQuit_triggered()
-{
-    QApplication::quit();
-}
-
-void MainWindow::on_actionAbout_triggered()
-{
-    AboutDialog dlg(this);
-    dlg.exec();
-}
-#endif
-
-//Adafruit_SSD1306 *emulator = new Adafruit_SSD1306;
 
 Adafruit_SSD1306::Adafruit_SSD1306(QWidget *parent) : 
-
     QWidget(parent)
 {
 
@@ -210,8 +85,8 @@ Adafruit_SSD1306::Adafruit_SSD1306(QWidget *parent) :
     dispBufferID = 1;
 
     //initialite
-    screenWidth = 128;
-    screenHeight = 64;
+    screenWidth = SSD1306_LCDWIDTH;
+    screenHeight = SSD1306_LCDHEIGHT;
 
     emulatorZoom = 2;
 
