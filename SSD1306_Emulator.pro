@@ -25,24 +25,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    emulator.cpp \
     glcdfont.c \
     aboutdialog.cpp \
     mainwindow.cpp \
+    emulator_keypad.cpp \
+    emulator_ssd1306.cpp \
     ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.cpp \
 
 HEADERS += \
-    emulator.h \
     gfxfont.h \
     aboutdialog.h \
     app_types.h \
     mainwindow.h \
+    emulator_keypad.h \
+    emulator_ssd1306.h \
     ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.h \
+    # ../../libraries/Analog_Keypad/src/AnalogKeypad.h \
 
 INCLUDEPATH += \
     ../../libraries/Adafruit_GFX_Menu/ \
     ../../libraries/Adafruit_GFX_Library/ \
     ../../libraries/Adafruit_SSD1306/ \
+    # ../../libraries/Analog_Keypad/src/ \
 
 FORMS += \
     aboutdialog.ui \

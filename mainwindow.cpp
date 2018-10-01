@@ -1,4 +1,5 @@
 
+#include <QPushButton>
 
 #include "app_types.h"
 
@@ -8,7 +9,8 @@
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
-#include "emulator.h"
+#include "emulator_ssd1306.h"
+#include "emulator_keypad.h"
 
 /* Include font files here */
 #include "font/FreeSans12pt7b.h"
@@ -17,14 +19,30 @@
 
 #include <Adafruit_GFX_Menu.h>
 
+
 uint8_t buffer[128 * 64 / 8];
+
 Bitmap lcd_bitmap;
 
 Adafruit_GFX_Menu *gfxmenu;
 Adafruit_SSD1306  *display;
 
+ButtonParam        param;
 
 static char tempStr[32] = {0};
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -134,10 +152,18 @@ static struct Menu info_screens =
 
 
 
+
+
+
+
+
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    /* Build GUI window configured with Qt Creator in file mainwindow.ui */
     ui->setupUi(this);
 
     /* Create layout for emulator widget */
@@ -199,7 +225,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->statusBar()->setSizeGripEnabled(false);
 
-    this->statusBar()->showMessage("Loaded SSD1603");
+    this->statusBar()->showMessage("Loaded SSD1603..");
+
+
+    /* Search all buttons and add to a group */
+    QButtonGroup* group = new QButtonGroup(this);
+
+    for (int i = 0; i < ui->gridLayout->count(); ++i)
+    {
+      QWidget *widget = ui->gridLayout->itemAt(i)->widget();
+      if (widget != NULL)
+      {
+        group->addButton(dynamic_cast<QPushButton*>(widget));
+      }
+    }
+
+    /* Create SLOT for every released button */
+    connect(group, SIGNAL(buttonReleased(int)), this, SLOT(on_pushButton_NONE(int)));
 
 
 
@@ -262,6 +304,43 @@ MainWindow::~MainWindow()
 }
 
 
+
+//void MainWindow::AddSlotsToGroup()
+//{
+
+
+    //connect(group, SIGNAL(buttonClicked(int)), this, SLOT(onGroupButtonClicked(int)));
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* SLOT Functions for GUI interaction */
+
 void MainWindow::on_actionQuit_triggered()
 {
     QApplication::quit();
@@ -273,33 +352,58 @@ void MainWindow::on_actionAbout_triggered()
     dlg.exec();
 }
 
+/* SLOT Functions for BUTTON interactions */
 
-void MainWindow::on_pushButton_LEFT_clicked()
+void MainWindow::on_pushButton_LEFT_pressed()
 {
     ui->statusBar->showMessage("Press LEFT");
     qDebug("LEFT");
+    
+    param.button = ButtonId_1;
+    param.state  = ButtonState_Click;
 }
 
-void MainWindow::on_pushButton_RIGHT_clicked()
+void MainWindow::on_pushButton_RIGHT_pressed()
 {
     ui->statusBar->showMessage("Press RIGHT");
     qDebug("RIGHT");
+    
+    param.button = ButtonId_2;
+    param.state  = ButtonState_Click;
 }
 
-void MainWindow::on_pushButton_UP_clicked()
+void MainWindow::on_pushButton_UP_pressed()
 {
     ui->statusBar->showMessage("Press UP");
     qDebug("UP");
+    
+    param.button = ButtonId_3;
+    param.state  = ButtonState_Click;
 }
 
-void MainWindow::on_pushButton_DOWN_clicked()
+void MainWindow::on_pushButton_DOWN_pressed()
 {
     ui->statusBar->showMessage("Press DOWN");
     qDebug("DOWN");
+
+    param.button = ButtonId_4;
+    param.state  = ButtonState_Click;
 }
 
-void MainWindow::on_pushButton_OK_clicked()
+void MainWindow::on_pushButton_OK_pressed()
 {
     ui->statusBar->showMessage("Press OK");
     qDebug("OK");
+
+    param.button = ButtonId_5;
+    param.state  = ButtonState_Click;
+}
+
+void MainWindow::on_pushButton_NONE(int)
+{
+    qDebug("Released!");
+    ui->statusBar->clearMessage();
+
+    param.button = ButtonId_None;
+    param.state  = ButtonState_Up;
 }

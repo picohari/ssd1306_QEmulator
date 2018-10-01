@@ -3,6 +3,15 @@
 
 #include <QMainWindow>
 
+
+
+
+
+
+
+
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -19,13 +28,19 @@ private slots:
     void on_actionQuit_triggered();
     void on_actionAbout_triggered();
 
-    void on_pushButton_LEFT_clicked();
-    void on_pushButton_RIGHT_clicked();
-    void on_pushButton_UP_clicked();
-    void on_pushButton_DOWN_clicked();
-    void on_pushButton_OK_clicked();
+    void on_pushButton_LEFT_pressed();
+    void on_pushButton_RIGHT_pressed();
+    void on_pushButton_UP_pressed();
+    void on_pushButton_DOWN_pressed();
+    void on_pushButton_OK_pressed();
+    
+    void on_pushButton_NONE(int);
+
 private:
     Ui::MainWindow *ui;
+
+    //void AddSlotsToGroup();
+
 };
 
 #endif // MAINWINDOW_H

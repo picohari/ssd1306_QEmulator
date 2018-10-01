@@ -26,7 +26,7 @@ THE SOFTWARE.
 */
 
 
-#include "emulator.h"
+#include "emulator_ssd1306.h"
 
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
