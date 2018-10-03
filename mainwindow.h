@@ -2,12 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
-
-
-
-
-
+#include <QTimerEvent>
 
 
 
@@ -24,6 +19,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void loop_menu();
+    
+    int readButtons(void);
+
 private slots:
     void on_actionQuit_triggered();
     void on_actionAbout_triggered();
@@ -33,14 +32,19 @@ private slots:
     void on_pushButton_UP_pressed();
     void on_pushButton_DOWN_pressed();
     void on_pushButton_OK_pressed();
-    
-    void on_pushButton_NONE(int);
+
+    void onGroupButtonClicked(int);
 
 private:
     Ui::MainWindow *ui;
+    int timerId;
 
-    //void AddSlotsToGroup();
+protected:
+    void timerEvent(QTimerEvent *event);
 
 };
+
+extern MainWindow *emul_win;
+
 
 #endif // MAINWINDOW_H

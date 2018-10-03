@@ -22,31 +22,34 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+#CONFIG  += qtestlib
 
 SOURCES += \
     main.cpp \
-    glcdfont.c \
     aboutdialog.cpp \
     mainwindow.cpp \
-    emulator_keypad.cpp \
     emulator_ssd1306.cpp \
+    # emulator_keypad.cpp \
+    ../../libraries/Adafruit_GFX_Library/glcdfont.c \
     ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.cpp \
+    ../../libraries/Adafruit_Keyboard/Adafruit_Keyboard.cpp \
 
 HEADERS += \
-    gfxfont.h \
     aboutdialog.h \
     app_types.h \
     mainwindow.h \
-    emulator_keypad.h \
     emulator_ssd1306.h \
+    # emulator_keypad.h \
+    ../../libraries/Adafruit_GFX_Library/gfxfont.h \
     ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.h \
-    # ../../libraries/Analog_Keypad/src/AnalogKeypad.h \
+    ../../libraries/Adafruit_Keyboard/Adafruit_Keyboard.h \
+    ../../libraries/Adafruit_Keyboard/list.h
 
 INCLUDEPATH += \
     ../../libraries/Adafruit_GFX_Menu/ \
-    ../../libraries/Adafruit_GFX_Library/ \
+    ../../libraries/Adafruit_GFX_Library/ \     # font.h
     ../../libraries/Adafruit_SSD1306/ \
-    # ../../libraries/Analog_Keypad/src/ \
+    ../../libraries/Adafruit_Keyboard/ \
 
 FORMS += \
     aboutdialog.ui \

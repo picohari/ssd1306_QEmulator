@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 #include <QDebug>
 
-#include "gfxfont.h"
+#include "../../libraries/Adafruit_GFX_Library/gfxfont.h"
 
 //colors
 #define BLACK QColor(0,0,0)

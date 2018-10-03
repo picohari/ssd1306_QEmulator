@@ -20,7 +20,7 @@ typedef struct {
 /// Data stored for FONT AS A WHOLE
 typedef struct { 
 	unsigned int  *bitmap;      ///< Glyph bitmaps, concatenated
-	GFXglyph *glyph;       ///< Glyph array
+    GFXglyph      *glyph;       ///< Glyph array
 
 	unsigned int   first;       ///< ASCII extents (first char)
     unsigned int   last;        ///< ASCII extents (last char)

@@ -1,5 +1,14 @@
+#include <QtGlobal>
 
+#include <QApplication>
 #include <QPushButton>
+#include <QTimer>
+
+
+//#include <QtTest/QtTest>
+#include <QDebug>
+
+
 
 #include "app_types.h"
 
@@ -10,24 +19,33 @@
 #include "ui_aboutdialog.h"
 
 #include "emulator_ssd1306.h"
-#include "emulator_keypad.h"
+
+
 
 /* Include font files here */
 #include "font/FreeSans12pt7b.h"
 #include "font/FreeSans9pt7b.h"
 #include "font/mina.h"
 
+
 #include <Adafruit_GFX_Menu.h>
 
+#include <Adafruit_Keyboard.h>
+//#include "emulator_keypad.h"
 
 uint8_t buffer[128 * 64 / 8];
 
 Bitmap lcd_bitmap;
 
-Adafruit_GFX_Menu *gfxmenu;
-Adafruit_SSD1306  *display;
 
-ButtonParam        param;
+/* Global emulator instance */
+MainWindow         *emul_win;
+
+Adafruit_SSD1306   *display;
+
+Adafruit_GFX_Menu  *emul_menu;  /* Global menu instance */
+Adafruit_Keyboard  *emul_kbd;   /* Global keyboard instance */
+
 
 static char tempStr[32] = {0};
 
@@ -52,7 +70,7 @@ static void gps_basis_info_display(void)
   display->setCursor(0, 7);
 
   sprintf(tempStr, "%s", "[ GPS ]:");
-  qDebug("GPS Menu");
+  //qDebug("GPS Menu");
   display->print(tempStr);
 }
 
@@ -62,7 +80,7 @@ static void aprs_basis_info_display(void)
   display->setCursor(0, 7);
 
   sprintf(tempStr, "%s", "[ APRS ]:");
-  qDebug("APRS Menu");
+  //qDebug("APRS Menu");
   display->print(tempStr);
 }
 
@@ -137,7 +155,7 @@ static struct MenuItem info_items[] =
   { (const_iptr_t)aprs_basis_info_display,  MIF_RENDERHOOK, (MenuHook)&Adafruit_GFX_Menu::menu_handle,  (iptr_t)&sys_menu },
   { (const_iptr_t)0,                        0,              NULL,                                       (iptr_t)0 }
 };
-static struct Menu info_screens = 
+static struct Menu info_screens =
 {
   /* Items */ /* Title */       /* Flags */             /* Bitmap */   /* Selected */  /* lcd_blitBitmap */
   info_items, "ROOT",           MF_STICKY | MF_SAVESEL, &lcd_bitmap,   0,              
@@ -158,7 +176,6 @@ static struct Menu info_screens =
 
 
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -166,17 +183,20 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Build GUI window configured with Qt Creator in file mainwindow.ui */
     ui->setupUi(this);
 
+    /* Set global pointer to this instance */
+    emul_win = this;
+
     /* Create layout for emulator widget */
     QVBoxLayout* verticalLayout = new QVBoxLayout;
     verticalLayout->setSpacing(0);
     verticalLayout->setMargin(0);
     ui->emulatorContainer->setLayout(verticalLayout);
 
-
     /* Create Emulator Widget */
-    
-    //display = new Adafruit_SSD1306;
     Adafruit_SSD1306 *emulator = new Adafruit_SSD1306;
+
+    /* Set global display pointer to this instance */
+    display = emulator;
 
     /* Set some default parameter */
     emulator->setEmulatorZoom(2);           /* Set zooming level */
@@ -207,7 +227,6 @@ MainWindow::MainWindow(QWidget *parent) :
     
     emulator->begin();
     
-    display = emulator;
 
     /* Get size of keypad so we can determine total height of window */
     QMargins keypad_margins = ui->gridLayout->contentsMargins();
@@ -241,26 +260,27 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     /* Create SLOT for every released button */
-    connect(group, SIGNAL(buttonReleased(int)), this, SLOT(on_pushButton_NONE(int)));
+    connect(group, SIGNAL(buttonReleased(int)), this, SLOT(onGroupButtonClicked(int)));
+
 
 
 
     /* Create Menu */
-    Adafruit_GFX_Menu *gfxmenu = new Adafruit_GFX_Menu;
+    emul_menu = new Adafruit_GFX_Menu;
+    emul_menu->menu_init(&lcd_bitmap, buffer, SSD1306_LCDWIDTH, SSD1306_LCDHEIGHT);
 
-    gfxmenu->menu_init(&lcd_bitmap, buffer, SSD1306_LCDWIDTH, SSD1306_LCDHEIGHT);
-    
-    gfxmenu->screen_handle(&info_screens);
+    /* Connect Keyboard */
+    emul_kbd  = new Adafruit_Keyboard;
+    emul_kbd->kbd_init();
 
-
-
-
+    /* Keyboard timer to poll buttons */
+    timerId = startTimer(10);
 
 
 
     /* ==> INSERT CODE HERE - BEGIN <== */
 
-#if 0
+#if 1
     /* Initialize Screen */
     emulator->clearDisplay();   // clears the screen and buffer
 
@@ -286,13 +306,15 @@ MainWindow::MainWindow(QWidget *parent) :
     //emulator->print("All your base are us");
 #endif
 
+#if 0
     emulator->drawPixel(0, 0, WHITE);
     emulator->drawPixel(127, 0, WHITE);
     emulator->drawPixel(0, 63, WHITE);
     emulator->drawPixel(127, 63, WHITE);
-
+#endif
     /* Must be called at the end to refresh the display */
     emulator->display();
+
     /* ==> INSERT CODE HERE - END <== */
 
 
@@ -305,13 +327,10 @@ MainWindow::~MainWindow()
 
 
 
-//void MainWindow::AddSlotsToGroup()
-//{
-
-
-    //connect(group, SIGNAL(buttonClicked(int)), this, SLOT(onGroupButtonClicked(int)));
-//}
-
+void MainWindow::loop_menu()
+{
+    //emul_menu->screen_handle(&info_screens);
+}
 
 
 
@@ -319,8 +338,56 @@ MainWindow::~MainWindow()
 
 
 
+void MainWindow::timerEvent(QTimerEvent *event)
+{
+    Adafruit_Keyboard *poll_kbd = new Adafruit_Keyboard();
+
+    poll_kbd->kbd_poll();
+}
 
 
+
+int MainWindow::readButtons(void)
+{
+    /* Search all buttons and add to a group */
+    QPushButton* button = new QPushButton(this);
+
+    QString objName = NULL;
+
+    int keymask = 0;
+
+    for (int i = 0; i < ui->gridLayout->count(); ++i)
+    {
+      QWidget *widget = ui->gridLayout->itemAt(i)->widget();
+      if (widget != NULL)
+      {
+        button = dynamic_cast<QPushButton*>(widget);
+        if (button->isDown()) {
+            objName = widget->objectName();
+
+            if       (objName == "pushButton_UP")       keymask |= (K_UP);
+            else if  (objName == "pushButton_DOWN")     keymask |= (K_DOWN);
+            else if  (objName == "pushButton_LEFT")     keymask |= (K_LEFT);
+            else if  (objName == "pushButton_RIGHT")    keymask |= (K_RIGHT);
+            else if  (objName == "pushButton_OK")       keymask |= (K_OK);
+
+            //qDebug("%s", qPrintable(objName));
+        }
+      }
+    }
+
+    return keymask;
+}
+
+
+
+
+#if 0
+extern "C" int emul_kbdReadCols(void)
+{
+    return 0;
+}
+#endif
 
 
 
@@ -352,58 +419,58 @@ void MainWindow::on_actionAbout_triggered()
     dlg.exec();
 }
 
+
 /* SLOT Functions for BUTTON interactions */
+#define DISABLE_SLOT_MSG    0
 
 void MainWindow::on_pushButton_LEFT_pressed()
 {
     ui->statusBar->showMessage("Press LEFT");
+    #if DISABLE_SLOT_MSG
     qDebug("LEFT");
-    
-    param.button = ButtonId_1;
-    param.state  = ButtonState_Click;
+    #endif
 }
 
 void MainWindow::on_pushButton_RIGHT_pressed()
 {
     ui->statusBar->showMessage("Press RIGHT");
+    #if DISABLE_SLOT_MSG
     qDebug("RIGHT");
-    
-    param.button = ButtonId_2;
-    param.state  = ButtonState_Click;
+    #endif
 }
 
 void MainWindow::on_pushButton_UP_pressed()
 {
     ui->statusBar->showMessage("Press UP");
+    #if DISABLE_SLOT_MSG
     qDebug("UP");
-    
-    param.button = ButtonId_3;
-    param.state  = ButtonState_Click;
+    #endif
 }
 
 void MainWindow::on_pushButton_DOWN_pressed()
 {
     ui->statusBar->showMessage("Press DOWN");
+    #if DISABLE_SLOT_MSG
     qDebug("DOWN");
-
-    param.button = ButtonId_4;
-    param.state  = ButtonState_Click;
+    #endif
 }
 
 void MainWindow::on_pushButton_OK_pressed()
 {
     ui->statusBar->showMessage("Press OK");
+    #if DISABLE_SLOT_MSG
     qDebug("OK");
-
-    param.button = ButtonId_5;
-    param.state  = ButtonState_Click;
+    #endif
 }
 
-void MainWindow::on_pushButton_NONE(int)
+void MainWindow::onGroupButtonClicked(int)
 {
-    qDebug("Released!");
     ui->statusBar->clearMessage();
-
-    param.button = ButtonId_None;
-    param.state  = ButtonState_Up;
+    #if DISABLE_SLOT_MSG
+    qDebug("Released!");
+    #endif
 }
+
+
+
+

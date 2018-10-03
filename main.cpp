@@ -32,7 +32,16 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    
     w.show();
 
-    return a.exec();
+    while(w.isVisible()) {
+
+        a.processEvents();
+
+        w.loop_menu();
+    }
+
+    return 0;
+    //return a.exec();
 }
