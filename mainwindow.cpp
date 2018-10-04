@@ -329,7 +329,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::loop_menu()
 {
-    //emul_menu->screen_handle(&info_screens);
+    emul_menu->screen_handle(&info_screens);
 }
 
 
