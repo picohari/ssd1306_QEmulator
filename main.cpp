@@ -35,11 +35,12 @@ int main(int argc, char *argv[])
     
     w.show();
 
+    
+
     while(w.isVisible()) {
 
-        a.processEvents();
-
         w.loop_menu();
+        a.processEvents();
     }
 
     return 0;

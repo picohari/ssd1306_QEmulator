@@ -5,7 +5,12 @@
 #include <QTimer>
 
 
-//#include <QtTest/QtTest>
+#include <QtTest>
+#include <QThread>
+
+#include <unistd.h>
+#include <typeinfo>
+
 #include <QDebug>
 
 
@@ -22,153 +27,308 @@
 
 
 
-/* Include font files here */
-#include "font/FreeSans12pt7b.h"
-#include "font/FreeSans9pt7b.h"
-#include "font/mina.h"
-
-
-#include <Adafruit_GFX_Menu.h>
-
 #include <Adafruit_Keyboard.h>
-//#include "emulator_keypad.h"
 
-uint8_t buffer[128 * 64 / 8];
-
-Bitmap lcd_bitmap;
+#include <MenuSystem.h>
 
 
 /* Global emulator instance */
 MainWindow         *emul_win;
 
 Adafruit_SSD1306   *display;
-
-Adafruit_GFX_Menu  *emul_menu;  /* Global menu instance */
 Adafruit_Keyboard  *emul_kbd;   /* Global keyboard instance */
 
-
-static char tempStr[32] = {0};
-
+MenuSystem         *menu_system;
 
 
+#define PCD8544_CHAR_HEIGHT 10
 
 
+class MyRenderer : public MenuComponentRenderer {
+public:
+    
 
+    void render(Menu const& menu) const {
 
+        uint8_t cursor_position = 0;
 
+        uint8_t first_item = 0;
+        
+        display->clearDisplay();
 
+        // For non-ROOT menu items, display list of menu items
+        if (menu.get_name() != "ROOT") {
 
+            display->setFont(&hp58pt8b);
+            //display->setFont(NULL);
+            display->setTextColor(WHITE, BLACK);
+            display->setCursor(0, 4);
+            display->print(menu.get_name());
 
+            int ydiff = 16; /* Pixel height to next line */
 
+            MenuComponent const* view_items[16];    /* TODO: Make dynamic here */
+            
+            // Count elements and find current one 
+            for (int i = 0; i < menu.get_num_components(); ++i) {
 
+                    view_items[i] = menu.get_menu_component(i);
 
+                    if( view_items[i]->is_current() ) {
+                        cursor_position = i;
+                    }
 
+            }
 
-static void gps_basis_info_display(void)
-{
-  display->setFont(&mina10pt8b);
-  display->setCursor(0, 7);
+            // Determine starting position in array
+            switch (cursor_position) {
+                case 0:  first_item = cursor_position - 0; break;
+                case 1:  first_item = cursor_position - 1; break;
+                default: first_item = cursor_position - 2;
+            }
 
-  sprintf(tempStr, "%s", "[ GPS ]:");
-  //qDebug("GPS Menu");
-  display->print(tempStr);
-}
+            // Now draw menu items on screen
+            for (int i = first_item; i < menu.get_num_components(); ++i) {
 
-static void aprs_basis_info_display(void)
-{
-  display->setFont(&mina10pt8b);
-  display->setCursor(0, 7);
+                MenuComponent const* cp_m_comp = menu.get_menu_component(i);
 
-  sprintf(tempStr, "%s", "[ APRS ]:");
-  //qDebug("APRS Menu");
-  display->print(tempStr);
-}
+                /* Select only MenuItem's */
+                if ( dynamic_cast<const     MenuItem*>(cp_m_comp) != NULL ||
+                     dynamic_cast<const BackMenuItem*>(cp_m_comp) != NULL ) {
 
+                    /*
+                    uint16_t flags = cp_m_comp->read_flags();
+                    char tmp[15] = {0};
 
+                    if (cp_m_comp->is_current() && cp_m_comp->read_flags() & MIF_DISABLED) {
 
+                    }
+                    */
 
-uint8_t gps_status = 0;
+                    if (cp_m_comp->is_current()) {
+                        display->fillRect(0, ydiff-8, 127, 11, WHITE);
+                        display->setTextColor(BLACK, WHITE);
+                    } else {
 
-static void demo1_menu_info_display(void)
-{
+                        display->setTextColor(WHITE, BLACK);
+                    }
 
-}
+                    display->setFont(&mina10pt8b);
+                    display->setCursor(4, ydiff);
 
-static void gps_status_toggle(iptr_t value)
-{
-  gps_status ^= ( 1 << *(uint8_t*)&value);
-}
+                    cp_m_comp->render(*this);
+                    
+                    //sprintf(tmp, "%d", flags);
+                    //display->print(tmp);
 
+                    ydiff += 11;
+                }
 
+            }
 
+        // On ROOT-Level, only display content of screens, no menu rendering active
+        } else {
+            
+            //if ( dynamic_cast<const     Menu*>(cp_m_comp) != NULL) {
 
-static struct MenuItem sys_items[] =
-{
-  /* Label */                         /* Flags */                   /* Hook */                                  /* User data*/
-  { (const_iptr_t)"Active SENSORS",   0,                            (MenuHook)&Adafruit_GFX_Menu::menu_handle,  (iptr_t)&lcd_bitmap },
-  { (const_iptr_t)"Active MODULES",   0,                            (MenuHook)&Adafruit_GFX_Menu::menu_handle,  (iptr_t)&lcd_bitmap },
-  { (const_iptr_t)"Show VERSION",     MIF_TOGGLE | MIF_SHOWSCREEN,  (MenuHook)demo1_menu_info_display,          (iptr_t)&lcd_bitmap },
-  { (const_iptr_t)"ABOUT ...",        MIF_TOGGLE | MIF_SHOWSCREEN,  (MenuHook)demo1_menu_info_display,          (iptr_t)&lcd_bitmap },
-  { (const_iptr_t)"Return",           MIF_DISABLED,                 NULL,                                       (iptr_t)0 },
-  { (const_iptr_t)0,                  0,                            NULL,                                       (iptr_t)0 }
+                menu.get_current_component()->render(*this);
+                
+            //}
+        
+        }
+
+        display->display();
+    }
+
+    void render_menu_item(MenuItem const& menu_item) const {
+        
+        display->print(menu_item.get_name());
+    }
+
+    void render_back_menu_item(BackMenuItem const& menu_item) const {
+        //display->setCursor(0, 1 * PCD8544_CHAR_HEIGHT);
+        display->print(menu_item.get_name());
+    }
+
+    void render_menu_screen(MenuScreen const& menu_item) const {
+
+        menu_item.show();
+    }
+
+    #if 0
+    void render_numeric_menu_item(NumericMenuItem const& menu_item) const {
+        display->setCursor(0, 1 * PCD8544_CHAR_HEIGHT);
+        display->print(menu_item.get_name());
+    }
+    #endif
+
+    void render_menu(Menu const& menu) const {
+
+        /* Rule to render menus as items inside another menu */
+
+        //display->setFont(&hp58pt8b);
+        //display->setTextColor(WHITE, BLACK);
+        //display->setCursor(0, 4);
+        //display->print(menu.get_name());
+
+        menu.show();
+    }
 };
-static struct Menu sys_menu = 
-{ 
-  /* Items */ /* Title */       /* Flags */             /* Bitmap */    /* Selected */  /* lcd_blitBitmap */
-  sys_items,  "[ SYS ]: MENU",  MF_STICKY | 0,          &lcd_bitmap,    0,
 
-#if CPU_AVR
-  0 };
-#else
-  0 };
-#endif
-
-
-
-static struct MenuItem gps_items[] =
-{
-  /* Label */                         /* Flags */                               /* Hook */                          /* User data*/
-  { (const_iptr_t)"Enable GPS",       MIF_CHECKIT | MIF_TOGGLE | MIF_CHECKED,   (MenuHook)gps_status_toggle,        (iptr_t)0 },
-  { (const_iptr_t)"Use GPS TIME",     MIF_CHECKIT | MIF_TOGGLE | MIF_CHECKED,   (MenuHook)demo1_menu_info_display,  (iptr_t)&lcd_bitmap },
-  { (const_iptr_t)"Set UNITS SI/US",  MIF_CHECKIT | MIF_TOGGLE | MIF_CHECKED,   (MenuHook)demo1_menu_info_display,  (iptr_t)&lcd_bitmap },
-  { (const_iptr_t)"Set TIMEZONE",     0,                                        (MenuHook)demo1_menu_info_display,  (iptr_t)&lcd_bitmap },
-  { (const_iptr_t)"Return",           MIF_DISABLED,                             NULL,                               (iptr_t)0 },
-  { (const_iptr_t)0,                  0,                                        NULL,                               (iptr_t)0 }
-};
-static struct Menu gps_menu = 
-{ 
-  /* Items */ /* Title */       /* Flags */             /* Bitmap */    /* Selected */  /* lcd_blitBitmap */
-  gps_items,  "[ GPS ]: MENU",  MF_STICKY | 0,          &lcd_bitmap,    0,
-
-#if CPU_HARVARD
-  0 };
-#else
-  0 };
-#endif
-
-
-/* TOP Level Screens to display*/
-static struct MenuItem info_items[] =
-{
-  /* Label */                               /* Flags */     /* Hook */                                  /* User data*/
-  { (const_iptr_t)gps_basis_info_display,   MIF_RENDERHOOK, (MenuHook)&Adafruit_GFX_Menu::menu_handle,  (iptr_t)&gps_menu },
-  { (const_iptr_t)aprs_basis_info_display,  MIF_RENDERHOOK, (MenuHook)&Adafruit_GFX_Menu::menu_handle,  (iptr_t)&sys_menu },
-  { (const_iptr_t)0,                        0,              NULL,                                       (iptr_t)0 }
-};
-static struct Menu info_screens =
-{
-  /* Items */ /* Title */       /* Flags */             /* Bitmap */   /* Selected */  /* lcd_blitBitmap */
-  info_items, "ROOT",           MF_STICKY | MF_SAVESEL, &lcd_bitmap,   0,              
-
-#if CPU_HARVARD
-  0 };
-#else
-  0 };
-#endif
+MyRenderer my_renderer;
 
 
 
 
+
+void show_desktop_1(void) {
+
+    display->clearDisplay();
+    display->setFont(&mina10pt8b);
+    display->setTextColor(WHITE, BLACK);
+    display->setCursor(10, 30);
+    display->print("Item1 Selectd");
+    //display->display();
+
+
+    display->setFont(&hp58pt8b);
+    display->setCursor(50, 62);
+    display->print("h  g  g  g");
+}
+
+void show_desktop_2(void) {
+
+    display->setFont(&hp58pt8b);
+    display->setCursor(50, 62);
+    display->print("g  h  g  g");
+}
+
+void show_desktop_3(void) {
+
+    display->setFont(&hp58pt8b);
+    display->setCursor(50, 62);
+    display->print("g  g  h  g");
+}
+
+void show_desktop_4(void) {
+
+    display->setFont(&hp58pt8b);
+    display->setCursor(50, 62);
+    display->print("g  g  g  h");
+}
+
+
+// Menu callback function
+
+void on_item1_selected(MenuComponent* p_menu_component) {
+    (void) p_menu_component;
+
+    display->clearDisplay();
+    display->setTextColor(WHITE, BLACK);
+    display->setCursor(0, 3 * PCD8544_CHAR_HEIGHT);
+    display->print("Item1 Selectd");
+    display->display();
+    //delay(1500); // so we can look the result on the LCD
+    QTest::qSleep( 2000 );
+}
+
+void on_item2_selected(MenuComponent* p_menu_component) {
+    (void) p_menu_component;
+
+    display->clearDisplay();
+    display->setTextColor(WHITE, BLACK);
+    display->setCursor(0, 3 * PCD8544_CHAR_HEIGHT);
+    display->print("Item2 Selectd");
+    display->display();
+    //delay(1500); // so we can look the result on the LCD
+    QTest::qSleep( 2000 );
+}
+
+void on_item3_selected(MenuComponent* p_menu_component) {
+    (void) p_menu_component;
+
+    display->clearDisplay();
+    display->setTextColor(WHITE, BLACK);
+    display->setCursor(0, 3 * PCD8544_CHAR_HEIGHT);
+    display->print("Item3 Selectd");
+    display->display();
+    //delay(1500); // so we can look the result on the LCD
+    QTest::qSleep( 2000 );
+}
+
+
+
+
+
+MenuSystem ms(my_renderer);
+
+
+    Menu root("ROOT");
+
+    Menu mu1("[ GPS ]: MENU",  nullptr,    &show_desktop_1);
+    Menu mu2("[ APRS ]: MENU", nullptr,    &show_desktop_2);
+    Menu mu3("[ WIFI ]: MENU", nullptr,    &show_desktop_3);
+    Menu mu4("[ SYS ]: MENU",  nullptr,    &show_desktop_4);
+
+//Menu mu2("[ APRS ]: MENU");
+//Menu mu3("[ SYS ]: MENU");
+
+
+    //MenuScreen  dkt1("ONE",             0,                 &show_desktop_1);
+    //MenuScreen  dkt2("TWO",             0,                 &show_desktop_2);
+    //MenuScreen  dkt3("TRI",             0,                 &show_desktop_3);
+    //MenuScreen  dkt4("FOR",             0,                 &show_desktop_4);
+
+
+    MenuItem mu1_mi1("Enable GPS",      0,              &on_item1_selected);
+    MenuItem mu1_mi2("Use GPS TIME",    0,              &on_item2_selected);
+    MenuItem mu1_mi3("Set UNITS SI/US", 0,              &on_item2_selected);
+    MenuItem mu1_mi4("Set Timezone",    MIF_DISABLED,   &on_item2_selected);
+    MenuItem mu1_mi5("Show Satellites", 0,              &on_item2_selected);
+    MenuItem mu1_mi6("Edit Refresh",    0,              &on_item2_selected);
+    MenuItem mu1_mi7("Configure NMEA",  0,              &on_item2_selected);
+BackMenuItem mu1_mi8("Return",          0,              &ms);
+
+
+
+
+void keyboard_handler() {
+    keymask_t key;
+
+    key = emul_kbd->kbd_peek();
+
+    if (key & K_UP) {
+        ms.prev();
+        ms.display();
+    }
+
+    if (key & K_DOWN) {
+        ms.next();
+        ms.display();
+    }
+
+    if (key & K_LEFT) {
+        if (ms.get_current_menu()->get_name() == "ROOT")
+            ms.prev();
+        else
+            ms.back();
+        ms.display();
+    }
+
+    if (key & K_RIGHT) {
+        if (ms.get_current_menu()->get_name() == "ROOT")
+            ms.next();
+        else
+            ms.select();
+        ms.display();
+    }
+
+    if (key & K_OK) {
+        ms.select();
+        ms.display();
+    }
+
+}
 
 
 
@@ -226,7 +386,6 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     
     emulator->begin();
-    
 
     /* Get size of keypad so we can determine total height of window */
     QMargins keypad_margins = ui->gridLayout->contentsMargins();
@@ -263,12 +422,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(group, SIGNAL(buttonReleased(int)), this, SLOT(onGroupButtonClicked(int)));
 
 
-
-
-    /* Create Menu */
-    emul_menu = new Adafruit_GFX_Menu;
-    emul_menu->menu_init(&lcd_bitmap, buffer, SSD1306_LCDWIDTH, SSD1306_LCDHEIGHT);
-
     /* Connect Keyboard */
     emul_kbd  = new Adafruit_Keyboard;
     emul_kbd->kbd_init();
@@ -277,34 +430,70 @@ MainWindow::MainWindow(QWidget *parent) :
     timerId = startTimer(10);
 
 
+    /* Create Menu */
+    menu_system = &ms;
+
+    ms.get_root_menu().add_menu(&root);
+    /*
+    ms.get_root_menu().add_menu(&mu1);
+    ms.get_root_menu().add_menu(&mu2);
+    ms.get_root_menu().add_menu(&mu3);
+    */
+    root.add_menu(&mu1);
+    root.add_menu(&mu2);
+    root.add_menu(&mu3);
+    root.add_menu(&mu4);
+    
+    //root.add_screen(&dkt1);
+    //root.add_screen(&dkt2);
+    //root.add_screen(&dkt3);
+    //root.add_screen(&dkt4);
+    
+    mu1.add_item(&mu1_mi1);
+    mu1.add_item(&mu1_mi2);
+    mu1.add_item(&mu1_mi3);
+    mu1.add_item(&mu1_mi4);
+    mu1.add_item(&mu1_mi5);
+    mu1.add_item(&mu1_mi6);
+    mu1.add_item(&mu1_mi7);
+    mu1.add_item(&mu1_mi8);
+
+    /* Jump from ROOT menu into first menu */
+    ms.select();
+    ms.display();
+
+
 
     /* ==> INSERT CODE HERE - BEGIN <== */
 
-#if 1
+    //emulator->clearDisplay();   // clears the screen and buffer
+#if 0
     /* Initialize Screen */
-    emulator->clearDisplay();   // clears the screen and buffer
 
     // Set default color and size
     emulator->setTextSize(1);
-    emulator->setTextColor(WHITE);
+    //emulator->setTextColor(BLACK, WHITE);
 
     // Using Adafruit fonts
     emulator->setFont(&FreeSans12pt7b);
-    emulator->setCursor(7,31);
+    emulator->setCursor(7,40);
     static char tmp[36] = {0};
     sprintf(tmp, "%s", "Hallo Welt!");
     emulator->print(tmp);
     
     // Using glcdfont
-    emulator->setFont(&mina10pt8b);
-    emulator->setCursor(0, 10);
-    sprintf(tmp, "%s", "All your base are us!");
+    emulator->setFont(&hp58pt8b);
+    //emulator->setFont(&mina10pt8b);
+    sprintf(tmp, "%s", "THIS IS HP5 FONT!");
+    //sprintf(tmp, "%s", "All your base are us!");
     emulator->print(tmp);
+#endif
     
     // Use of standard text
-    //emulator->setFont(NULL);
+    emulator->setTextColor(WHITE, BLACK);
+    emulator->setCursor(0, 10);
+    emulator->setFont(NULL);
     //emulator->print("All your base are us");
-#endif
 
 #if 0
     emulator->drawPixel(0, 0, WHITE);
@@ -312,11 +501,12 @@ MainWindow::MainWindow(QWidget *parent) :
     emulator->drawPixel(0, 63, WHITE);
     emulator->drawPixel(127, 63, WHITE);
 #endif
+
     /* Must be called at the end to refresh the display */
+    ms.display();
     emulator->display();
 
     /* ==> INSERT CODE HERE - END <== */
-
 
 }
 
@@ -329,7 +519,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::loop_menu()
 {
-    emul_menu->screen_handle(&info_screens);
+  keyboard_handler();
 }
 
 
@@ -337,16 +527,22 @@ void MainWindow::loop_menu()
 
 
 
-
+/* Called by timer */
 void MainWindow::timerEvent(QTimerEvent *event)
 {
+    (void) event;
+
     Adafruit_Keyboard *poll_kbd = new Adafruit_Keyboard();
 
     poll_kbd->kbd_poll();
 }
 
 
+/* Keyboard emulation
 
+   This function emulates the pressed buttons on a real keyboard and returns
+   a specific type keymask_t for keyboard driver.
+*/
 int MainWindow::readButtons(void)
 {
     /* Search all buttons and add to a group */
@@ -381,13 +577,6 @@ int MainWindow::readButtons(void)
 
 
 
-
-#if 0
-extern "C" int emul_kbdReadCols(void)
-{
-    return 0;
-}
-#endif
 
 
 

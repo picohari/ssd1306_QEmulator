@@ -43,6 +43,12 @@ THE SOFTWARE.
 
 #include "../../libraries/Adafruit_GFX_Library/gfxfont.h"
 
+/* Include font files here */
+#include "font/FreeSans12pt7b.h"
+#include "font/FreeSans9pt7b.h"
+#include "font/mina.h"
+#include "font/hp5.h"
+
 //colors
 #define BLACK QColor(0,0,0)
 #define WHITE QColor(222,239,232)
@@ -116,6 +122,7 @@ public:
 
     //font drawing
     void setCursor(int x, int y);
+    void setTextColor(QColor color, QColor bg);
     void setTextColor(QColor color);
     void setTextSize(int size);
     void print(const char * string);
@@ -154,6 +161,7 @@ private:
     QFont pixelFont;
     int cursorX, cursorY;
     QColor textColor;
+    QColor bgColor;
     int textSize;
 
     //checkers

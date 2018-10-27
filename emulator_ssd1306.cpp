@@ -319,8 +319,13 @@ void Adafruit_SSD1306::setCursor(int x, int y){
     this->cursorY = y;
 }
 
-void Adafruit_SSD1306::setTextColor(QColor color){
+void Adafruit_SSD1306::setTextColor(QColor color, QColor bg){
     this->textColor = color;
+    this->bgColor = bg;
+}
+
+void Adafruit_SSD1306::setTextColor(QColor color){
+    this->textColor = this->bgColor = color;
 }
 
 void Adafruit_SSD1306::setTextSize(int size){
@@ -384,6 +389,10 @@ void Adafruit_SSD1306::drawChar(int16_t x, int16_t y, unsigned char c, QColor co
 
         if(true && (c >= 176)) c++; // Handle 'classic' charset behavior
 
+        if (bg != color) { // If opaque, draw vertical line for first column
+            drawLine(x-1, y-1, x-1, y+7, bg);
+        };
+
         //startWrite();
         for(uint8_t i=0; i<5; i++ ) { // Char bitmap = 5 columns
             uint8_t line = pgm_read_byte(&font[c * 5 + i]);
@@ -400,11 +409,14 @@ void Adafruit_SSD1306::drawChar(int16_t x, int16_t y, unsigned char c, QColor co
                         fillRect(x+i*size, y+j*size, size, size, bg);
                 }
             }
+            if (bg != color) drawPixel(x+i, y-1, bg);
         }
+        #if 1
         if(bg != color) { // If opaque, draw vertical line for last column
-            if(size == 1) drawLine(x+5, y, x+5, y+8, bg);
+            if(size == 1) drawLine(x+5, y-1, x+5, y+7, bg);
             else          fillRect(x+5*size, y, size, 8*size, bg);
         }
+        #endif
         //endWrite();
 
 
@@ -462,7 +474,11 @@ void Adafruit_SSD1306::drawChar(int16_t x, int16_t y, unsigned char c, QColor co
                         fillRect(x+(xo16+xx)*size, y+(yo16+yy)*size,
                           size, size, color);
                     }
-                }
+                } 
+                /*
+                else
+                    drawPixel(x+xo+xx, y+yo+yy, bg);
+                */
                 bits <<= 1;
             }
         }
@@ -496,7 +512,7 @@ size_t Adafruit_SSD1306::write(uint8_t c){
                 cursorX  = 0;                 // Reset x to zero,
                 cursorY += textSize * 8;      // advance y one line
             }
-            drawChar(cursorX, cursorY, c, WHITE, BLACK, textSize);
+            drawChar(cursorX, cursorY, c, textColor, bgColor, textSize);
             cursorX += textSize * 6;          // Advance x one char
         }
 
@@ -520,7 +536,7 @@ size_t Adafruit_SSD1306::write(uint8_t c){
                         cursorY += (int16_t)textSize *
                           (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
                     }
-                    drawChar(cursorX, cursorY, c, WHITE, BLACK, textSize);
+                    drawChar(cursorX, cursorY, c, textColor, bgColor, textSize);
                 }
                 cursorX += (uint8_t)pgm_read_byte(&glyph->xAdvance) * (int16_t)textSize;
             }
@@ -588,10 +604,14 @@ void Adafruit_SSD1306::fillCircle(int x, int y, int r, int color){
 }
 
 void Adafruit_SSD1306::drawBitmap(int x, int y, const unsigned char *bitmap, int w, int h, int color){
+    #if 0
     if(color)
         drawBitmap(x,y,bitmap,w,h,WHITE);
     else
         drawBitmap(x,y,bitmap,w,h,BLACK);
+    #endif
+
+    drawBitmap(x, y, bitmap, w, h, color);
 }
 
 

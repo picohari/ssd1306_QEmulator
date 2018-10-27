@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += testlib
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,27 +30,31 @@ SOURCES += \
     aboutdialog.cpp \
     mainwindow.cpp \
     emulator_ssd1306.cpp \
-    # emulator_keypad.cpp \
     ../../libraries/Adafruit_GFX_Library/glcdfont.c \
-    ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.cpp \
     ../../libraries/Adafruit_Keyboard/Adafruit_Keyboard.cpp \
+    ../../libraries/Arduino_Menusystem/MenuSystem.cpp \
+    # ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.cpp \
+    # emulator_keypad.cpp \
+
 
 HEADERS += \
     aboutdialog.h \
     app_types.h \
     mainwindow.h \
     emulator_ssd1306.h \
-    # emulator_keypad.h \
     ../../libraries/Adafruit_GFX_Library/gfxfont.h \
-    ../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.h \
     ../../libraries/Adafruit_Keyboard/Adafruit_Keyboard.h \
-    ../../libraries/Adafruit_Keyboard/list.h
+    ../../libraries/Adafruit_Keyboard/list.h \
+    ../../libraries/Arduino_Menusystem/MenuSystem.h \
+    #../../libraries/Adafruit_GFX_Menu/Adafruit_GFX_Menu.h \
+    # emulator_keypad.h \
 
 INCLUDEPATH += \
-    ../../libraries/Adafruit_GFX_Menu/ \
     ../../libraries/Adafruit_GFX_Library/ \     # font.h
     ../../libraries/Adafruit_SSD1306/ \
     ../../libraries/Adafruit_Keyboard/ \
+    ../../libraries/Arduino_Menusystem/ \
+    #../../libraries/Adafruit_GFX_Menu/ \
 
 FORMS += \
     aboutdialog.ui \
